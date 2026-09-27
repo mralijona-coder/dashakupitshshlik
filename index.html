@@ -46,7 +46,7 @@
             color: #d32f2f;
             font-size: 22px;
             font-weight: bold;
-            margin-bottom: 25px;
+            margin-bottom: 35px;
             display: none;
         }
 
@@ -66,10 +66,27 @@
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.2s, box-shadow 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             width: 85%;
+        }
+
+        /* Кнопки ДА (зеленая и синяя) */
+        .btn-yes-green {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+        }
+
+        .btn-yes-blue {
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            color: white;
+        }
+
+        /* Кнопка НЕТ (красная) */
+        .btn-no {
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            color: white;
         }
 
         .btn:hover {
@@ -77,48 +94,45 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
-        /* Первая кнопка Да */
+        /* Позиции для первого экрана */
         #yesBtn1 {
-            background: linear-gradient(135deg, #11998e, #38ef7d);
-            color: white;
             position: absolute;
             left: 50%;
             top: 10px;
             transform: translateX(-50%);
         }
 
-        /* Вторая кнопка Да, куплю */
         #yesBtn2 {
-            background: linear-gradient(135deg, #00b4db, #0083b0);
-            color: white;
             position: absolute;
             left: 50%;
             top: 85px;
             transform: translateX(-50%);
         }
 
-        /* Третья кнопка Нажми чтобы выбрать нет */
         #noBtnTrigger {
-            background: linear-gradient(135deg, #ff9966, #ff5e62);
-            color: white;
             position: absolute;
             left: 50%;
             top: 170px;
             transform: translateX(-50%);
         }
 
-        /* Убегающая кнопка Нет */
-        #runningNoBtn {
+        /* Кнопки-обманщицы (для второго экрана) */
+        #trickYesBtn {
             display: none;
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-            color: white;
             position: absolute;
             left: 50%;
-            top: 170px;
+            top: 40px;
+            transform: translateX(-50%);
+        }
+
+        #trickNoBtn {
+            display: none;
+            position: absolute;
+            left: 50%;
+            top: 130px;
             transform: translateX(-50%);
             touch-action: none;
-            width: auto;
-            padding: 14px 50px;
+            /* Отключает стандартные жесты на мобилках */
         }
 
         .hidden-screen {
@@ -147,13 +161,17 @@
             text-align: center;
         }
 
+        .math-input:focus {
+            border-color: #38ef7d;
+        }
+
         .submit-btn {
             background: #2c3e50;
             color: white;
             width: 85%;
         }
 
-        /* Фирменная желтая ссылка на Яндекс Еду на чистом экране */
+        /* Желтая кнопка Яндекса на чистом экране */
         .yandex-link {
             display: inline-block;
             padding: 18px 45px;
@@ -184,10 +202,14 @@
             <h1 id="mainTitle">Купишь мне шашлык</h1>
             <div id="notSoEasyText" class="hint-text">Не всё так просто... Всё-таки нажми ДА! 😈</div>
             <div class="buttons-area">
-                <button id="yesBtn1" class="btn">Да</button>
-                <button id="yesBtn2" class="btn">Да, куплю</button>
-                <button id="noBtnTrigger" class="btn">Нажми чтобы выбрать нет</button>
-                <button id="runningNoBtn" class="btn">Нет</button>
+                <!-- Кнопки первого экрана -->
+                <button id="yesBtn1" class="btn btn-yes-green">Да</button>
+                <button id="yesBtn2" class="btn btn-yes-blue">Да, куплю</button>
+                <button id="noBtnTrigger" class="btn btn-no">Нажми чтобы выбрать нет</button>
+
+                <!-- Кнопки-обманщицы для второго экрана -->
+                <button id="trickYesBtn" class="btn btn-yes-green">Да</button>
+                <button id="trickNoBtn" class="btn btn-no">Нет</button>
             </div>
         </div>
 
@@ -199,9 +221,9 @@
             <button id="checkAnswerBtn" class="btn submit-btn">Проверить</button>
         </div>
 
-        <!-- ЭКРАН 3: Только ссылка на Яндекс Еду -->
+        <!-- ЭКРАН 3: Чистый финал с Яндекс Едой -->
         <div id="screenSuccess" class="hidden-screen">
-            <a href="https://yandex.ru" target="_blank" class="yandex-link">Выбрать в Яндекс Еде 💛</a>
+            <a href="https://google.com" target="_blank" class="yandex-link">Выбрать в Яндекс Еде 💛</a>
         </div>
     </div>
 
@@ -209,7 +231,9 @@
         const yesBtn1 = document.getElementById('yesBtn1');
         const yesBtn2 = document.getElementById('yesBtn2');
         const noBtnTrigger = document.getElementById('noBtnTrigger');
-        const runningNoBtn = document.getElementById('runningNoBtn');
+
+        const trickYesBtn = document.getElementById('trickYesBtn');
+        const trickNoBtn = document.getElementById('trickNoBtn');
 
         const screenQuestion = document.getElementById('screenQuestion');
         const screenMath = document.getElementById('screenMath');
@@ -220,67 +244,62 @@
         const mathAnswer = document.getElementById('mathAnswer');
         const checkAnswerBtn = document.getElementById('checkAnswerBtn');
 
-        let isRunningMode = false;
+        // Флаг текущего положения кнопок-обманщиц (false - стандартно, true - поменялись местами)
+        let isSwapped = false;
 
-        // Переход на финал при нажатии на любую из двух кнопок "Да"
-        yesBtn1.addEventListener('click', () => {
+        // Переход на финал при нажатии на любую кнопку согласия
+        function openSuccess() {
             screenQuestion.style.display = 'none';
             screenSuccess.style.display = 'block';
-        });
+        }
 
-        yesBtn2.addEventListener('click', () => {
-            screenQuestion.style.display = 'none';
-            screenSuccess.style.display = 'block';
-        });
+        yesBtn1.addEventListener('click', openSuccess);
+        yesBtn2.addEventListener('click', openSuccess);
+        trickYesBtn.addEventListener('click', openSuccess);
 
-        // Нажатие на "Нажми чтобы выбрать нет" -> логарифм
+        // Нажатие на "Нажми чтобы выбрать нет" -> переход к логарифму
         noBtnTrigger.addEventListener('click', () => {
             screenQuestion.style.display = 'none';
             screenMath.style.display = 'block';
         });
 
-        // Проверка ответа (log2(16) = 4)
+        // Проверка логарифма
         checkAnswerBtn.addEventListener('click', () => {
             const answer = mathAnswer.value.trim();
             if (answer === '4') {
                 screenMath.style.display = 'none';
                 screenQuestion.style.display = 'block';
 
+                // Скрываем старые элементы первого экрана
                 mainTitle.style.display = 'none';
+                yesBtn1.style.display = 'none';
+                yesBtn2.style.display = 'none';
                 noBtnTrigger.style.display = 'none';
 
+                // Включаем режим обманщика: текст и новые две кнопки
                 notSoEasyText.style.display = 'block';
-                runningNoBtn.style.display = 'block';
-
-                // Перемещаем кнопки согласия чуть ниже предупреждения
-                yesBtn1.style.top = '100px';
-                yesBtn2.style.top = '175px';
+                trickYesBtn.style.display = 'block';
+                trickNoBtn.style.display = 'block';
             } else {
                 alert('Неправильно! Попробуй еще раз 🎯');
             }
         });
 
-        // Логика побега для хитрой кнопки "Нет"
-        function moveButton() {
-            if (!isRunningMode) {
-                isRunningMode = true;
-                runningNoBtn.style.transition = 'all 0.12s ease-out';
-                runningNoBtn.style.width = 'auto'; // Возвращаем компактную ширину при побеге
+        // Функция изменения мест для кнопок-обманщиц
+        function swapButtons(e) {
+            if (e) e.preventDefault(); // Важно для мобилок, чтобы не срабатывал ложный клик
+
+            if (!isSwapped) {
+                // Меняем координаты (Нет встает наверх, Да опускается вниз)
+                trickNoBtn.style.top = '40px';
+                trickYesBtn.style.top = '130px';
+                isSwapped = true;
+            } else {
+                // Возвращаем обратно
+                trickNoBtn.style.top = '130px';
+                trickYesBtn.style.top = '40px';
+                isSwapped = false;
             }
-            const randomX = Math.floor(Math.random() * 70) + 5;
-            const randomY = Math.floor(Math.random() * 55) + 220; // Держим кнопку внизу, чтобы не налетала на текст
-            runningNoBtn.style.left = randomX + '%';
-            runningNoBtn.style.top = randomY + 'px';
         }
 
-        runningNoBtn.addEventListener('mouseenter', moveButton);
-        runningNoBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            moveButton();
-        });
-        runningNoBtn.addEventListener('click', moveButton);
-    </script>
-
-</body>
-
-</html>
+        // Срабатывает на ПК при наведении мыши на "Нет"
