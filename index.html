@@ -50,11 +50,13 @@
             display: none;
         }
 
-        /* Область для позиционирования кнопок */
         .buttons-area {
-            position: relative;
-            height: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
             width: 100%;
+            min-height: 200px;
         }
 
         /* Стильные современные кнопки */
@@ -66,73 +68,26 @@
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             width: 85%;
+            box-sizing: border-box;
         }
 
-        /* Кнопки ДА (зеленая и синяя) */
-        .btn-yes-green {
+        /* Цвета кнопок */
+        .btn-green {
             background: linear-gradient(135deg, #11998e, #38ef7d);
             color: white;
         }
 
-        .btn-yes-blue {
+        .btn-blue {
             background: linear-gradient(135deg, #00b4db, #0083b0);
             color: white;
         }
 
-        /* Кнопка НЕТ (красная) */
-        .btn-no {
+        .btn-red {
             background: linear-gradient(135deg, #ff9966, #ff5e62);
             color: white;
-        }
-
-        .btn:hover {
-            transform: scale(1.02) translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Позиции для первого экрана */
-        #yesBtn1 {
-            position: absolute;
-            left: 50%;
-            top: 10px;
-            transform: translateX(-50%);
-        }
-
-        #yesBtn2 {
-            position: absolute;
-            left: 50%;
-            top: 85px;
-            transform: translateX(-50%);
-        }
-
-        #noBtnTrigger {
-            position: absolute;
-            left: 50%;
-            top: 170px;
-            transform: translateX(-50%);
-        }
-
-        /* Кнопки-обманщицы (для второго экрана) */
-        #trickYesBtn {
-            display: none;
-            position: absolute;
-            left: 50%;
-            top: 40px;
-            transform: translateX(-50%);
-        }
-
-        #trickNoBtn {
-            display: none;
-            position: absolute;
-            left: 50%;
-            top: 130px;
-            transform: translateX(-50%);
-            touch-action: none;
-            /* Отключает стандартные жесты на мобилках */
         }
 
         .hidden-screen {
@@ -161,17 +116,13 @@
             text-align: center;
         }
 
-        .math-input:focus {
-            border-color: #38ef7d;
-        }
-
         .submit-btn {
             background: #2c3e50;
             color: white;
             width: 85%;
         }
 
-        /* Желтая кнопка Яндекса на чистом экране */
+        /* Чистая желтая кнопка Яндекса */
         .yandex-link {
             display: inline-block;
             padding: 18px 45px;
@@ -182,14 +133,8 @@
             text-decoration: none;
             border-radius: 18px;
             box-shadow: 0 6px 20px rgba(255, 244, 0, 0.45);
-            transition: all 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        .yandex-link:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(255, 244, 0, 0.6);
         }
     </style>
 </head>
@@ -202,14 +147,14 @@
             <h1 id="mainTitle">Купишь мне шашлык</h1>
             <div id="notSoEasyText" class="hint-text">Не всё так просто... Всё-таки нажми ДА! 😈</div>
             <div class="buttons-area">
-                <!-- Кнопки первого экрана -->
-                <button id="yesBtn1" class="btn btn-yes-green">Да</button>
-                <button id="yesBtn2" class="btn btn-yes-blue">Да, куплю</button>
-                <button id="noBtnTrigger" class="btn btn-no">Нажми чтобы выбрать нет</button>
+                <!-- Кнопки первого этапа -->
+                <button id="yesBtn1" class="btn btn-green">Да</button>
+                <button id="yesBtn2" class="btn btn-blue">Да, куплю</button>
+                <button id="noBtnTrigger" class="btn btn-red">Нажми чтобы выбрать нет</button>
 
-                <!-- Кнопки-обманщицы для второго экрана -->
-                <button id="trickYesBtn" class="btn btn-yes-green">Да</button>
-                <button id="trickNoBtn" class="btn btn-no">Нет</button>
+                <!-- Новые кнопки для второго этапа -->
+                <button id="trickYesBtn" class="btn btn-green" style="display: none;">Да</button>
+                <button id="trickNoBtn" class="btn btn-red" style="display: none;">Нет</button>
             </div>
         </div>
 
@@ -244,10 +189,6 @@
         const mathAnswer = document.getElementById('mathAnswer');
         const checkAnswerBtn = document.getElementById('checkAnswerBtn');
 
-        // Флаг текущего положения кнопок-обманщиц (false - стандартно, true - поменялись местами)
-        let isSwapped = false;
-
-        // Переход на финал при нажатии на любую кнопку согласия
         function openSuccess() {
             screenQuestion.style.display = 'none';
             screenSuccess.style.display = 'block';
@@ -257,26 +198,23 @@
         yesBtn2.addEventListener('click', openSuccess);
         trickYesBtn.addEventListener('click', openSuccess);
 
-        // Нажатие на "Нажми чтобы выбрать нет" -> переход к логарифму
         noBtnTrigger.addEventListener('click', () => {
             screenQuestion.style.display = 'none';
             screenMath.style.display = 'block';
         });
 
-        // Проверка логарифма
+        // Ответ на задачу
         checkAnswerBtn.addEventListener('click', () => {
             const answer = mathAnswer.value.trim();
             if (answer === '4') {
                 screenMath.style.display = 'none';
                 screenQuestion.style.display = 'block';
 
-                // Скрываем старые элементы первого экрана
                 mainTitle.style.display = 'none';
                 yesBtn1.style.display = 'none';
                 yesBtn2.style.display = 'none';
                 noBtnTrigger.style.display = 'none';
 
-                // Включаем режим обманщика: текст и новые две кнопки
                 notSoEasyText.style.display = 'block';
                 trickYesBtn.style.display = 'block';
                 trickNoBtn.style.display = 'block';
@@ -285,21 +223,41 @@
             }
         });
 
-        // Функция изменения мест для кнопок-обманщиц
-        function swapButtons(e) {
-            if (e) e.preventDefault(); // Важно для мобилок, чтобы не срабатывал ложный клик
+        // Мобильный трюк: подмена кнопок при прикосновении к "Нет"
+        function handleMobileTrick(e) {
+            e.preventDefault(); // Блокируем реальный клик по "Нет"
 
-            if (!isSwapped) {
-                // Меняем координаты (Нет встает наверх, Да опускается вниз)
-                trickNoBtn.style.top = '40px';
-                trickYesBtn.style.top = '130px';
-                isSwapped = true;
-            } else {
-                // Возвращаем обратно
-                trickNoBtn.style.top = '130px';
-                trickYesBtn.style.top = '40px';
-                isSwapped = false;
-            }
+            // Превращаем "Нет" в кнопку "Да"
+            trickNoBtn.className = "btn btn-green";
+            trickNoBtn.innerText = "ДА";
+
+            // А "Да" превращаем в красное "Нет"
+            trickYesBtn.className = "btn btn-red";
+            trickYesBtn.innerText = "НЕТ";
+
+            // Открываем финал через 150 миллисекунд
+            setTimeout(() => {
+                openSuccess();
+            }, 150);
         }
 
-        // Срабатывает на ПК при наведении мыши на "Нет"
+        // События для телефонов (тапы)
+        trickNoBtn.addEventListener('touchstart', handleMobileTrick, { passive: false });
+
+        // События для мышки (ПК)
+        trickNoBtn.addEventListener('mouseenter', () => {
+            const textNo = trickNoBtn.innerText;
+            trickNoBtn.innerText = trickYesBtn.innerText;
+            trickYesBtn.innerText = textNo;
+
+            trickNoBtn.classList.toggle('btn-red');
+            trickNoBtn.classList.toggle('btn-green');
+            trickYesBtn.classList.toggle('btn-red');
+            trickYesBtn.classList.toggle('btn-green');
+        });
+        trickNoBtn.addEventListener('click', (e) => e.preventDefault());
+    </script>
+
+</body>
+
+</html>
