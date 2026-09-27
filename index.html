@@ -33,6 +33,11 @@
             padding: 30px;
             border-radius: 24px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
         }
 
         h1 {
@@ -54,9 +59,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 15px;
             width: 100%;
-            min-height: 200px;
+            min-height: 220px;
         }
 
         /* Стильные современные кнопки */
@@ -72,6 +78,7 @@
             letter-spacing: 0.5px;
             width: 85%;
             box-sizing: border-box;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         /* Цвета кнопок */
@@ -135,15 +142,20 @@
             box-shadow: 0 6px 20px rgba(255, 244, 0, 0.45);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            transition: transform 0.2s;
+        }
+
+        .yandex-link:hover {
+            transform: scale(1.05);
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
+    <div class="container" id="mainContainer">
         <!-- ЭКРАН 1: Главный вопрос -->
-        <div id="screenQuestion">
+        <div id="screenQuestion" style="width: 100%;">
             <h1 id="mainTitle">Купишь мне шашлык</h1>
             <div id="notSoEasyText" class="hint-text">Не всё так просто... Всё-таки нажми ДА! 😈</div>
             <div class="buttons-area">
@@ -159,16 +171,16 @@
         </div>
 
         <!-- ЭКРАН 2: Логарифм -->
-        <div id="screenMath" class="hidden-screen">
+        <div id="screenMath" style="width: 100%;" class="hidden-screen">
             <h1>Реши задачу 🧐</h1>
             <div class="math-box">log₂ (16) = ?</div>
             <input type="number" id="mathAnswer" class="math-input" placeholder="Введите ответ">
             <button id="checkAnswerBtn" class="btn submit-btn">Проверить</button>
         </div>
 
-        <!-- ЭКРАН 3: Чистый финал с Яндекс Едой -->
+        <!-- ЭКРАН 3: Чистый финал с прямой ссылкой на Яндекс Еду -->
         <div id="screenSuccess" class="hidden-screen">
-            <a href="https://google.com" target="_blank" class="yandex-link">Выбрать в Яндекс Еде 💛</a>
+            <a href="https://eda.yandex.ru/" target="_blank" class="yandex-link">Выбрать в Яндекс Еде 💛</a>
         </div>
     </div>
 
@@ -185,13 +197,22 @@
         const screenSuccess = document.getElementById('screenSuccess');
         const notSoEasyText = document.getElementById('notSoEasyText');
         const mainTitle = document.getElementById('mainTitle');
+        const mainContainer = document.getElementById('mainContainer');
 
         const mathAnswer = document.getElementById('mathAnswer');
         const checkAnswerBtn = document.getElementById('checkAnswerBtn');
 
+        let yesScale = 1.0;
+        let noScale = 1.0;
+        let noOpacity = 1.0;
+
         function openSuccess() {
             screenQuestion.style.display = 'none';
             screenSuccess.style.display = 'block';
+            mainContainer.style.width = '100%';
+            mainContainer.style.maxWidth = '420px';
+            mainContainer.style.height = 'auto';
+            mainContainer.style.padding = '30px';
         }
 
         yesBtn1.addEventListener('click', openSuccess);
@@ -203,7 +224,6 @@
             screenMath.style.display = 'block';
         });
 
-        // Ответ на задачу
         checkAnswerBtn.addEventListener('click', () => {
             const answer = mathAnswer.value.trim();
             if (answer === '4') {
@@ -223,39 +243,30 @@
             }
         });
 
-        // Мобильный трюк: подмена кнопок при прикосновении к "Нет"
-        function handleMobileTrick(e) {
-            e.preventDefault(); // Блокируем реальный клик по "Нет"
+        function growYesButton(e) {
+            if (e) e.preventDefault();
 
-            // Превращаем "Нет" в кнопку "Да"
-            trickNoBtn.className = "btn btn-green";
-            trickNoBtn.innerText = "ДА";
+            yesScale += 0.35;
+            noScale -= 0.15;
+            noOpacity -= 0.2;
 
-            // А "Да" превращаем в красное "Нет"
-            trickYesBtn.className = "btn btn-red";
-            trickYesBtn.innerText = "НЕТ";
+            if (noScale <= 0.3) {
+                trickNoBtn.style.display = 'none';
+            } else {
+                trickNoBtn.style.transform = `scale(${noScale})`;
+                trickNoBtn.style.opacity = noOpacity;
+            }
 
-            // Открываем финал через 150 миллисекунд
-            setTimeout(() => {
-                openSuccess();
-            }, 150);
+            trickYesBtn.style.transform = `scale(${yesScale})`;
+
+            if (yesScale > 2.0) {
+                mainContainer.style.maxWidth = '100vw';
+                mainContainer.style.width = '90%';
+            }
         }
 
-        // События для телефонов (тапы)
-        trickNoBtn.addEventListener('touchstart', handleMobileTrick, { passive: false });
-
-        // События для мышки (ПК)
-        trickNoBtn.addEventListener('mouseenter', () => {
-            const textNo = trickNoBtn.innerText;
-            trickNoBtn.innerText = trickYesBtn.innerText;
-            trickYesBtn.innerText = textNo;
-
-            trickNoBtn.classList.toggle('btn-red');
-            trickNoBtn.classList.toggle('btn-green');
-            trickYesBtn.classList.toggle('btn-red');
-            trickYesBtn.classList.toggle('btn-green');
-        });
-        trickNoBtn.addEventListener('click', (e) => e.preventDefault());
+        trickNoBtn.addEventListener('click', growYesButton);
+        trickNoBtn.addEventListener('touchstart', growYesButton, { passive: false });
     </script>
 
 </body>
