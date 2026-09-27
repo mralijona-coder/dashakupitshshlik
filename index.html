@@ -50,12 +50,14 @@
             display: none;
         }
 
+        /* Область для позиционирования кнопок */
         .buttons-area {
             position: relative;
-            height: 300px;
+            height: 320px;
             width: 100%;
         }
 
+        /* Стильные современные кнопки */
         .btn {
             padding: 14px 40px;
             font-size: 16px;
@@ -67,40 +69,56 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            width: 85%;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
+            transform: scale(1.02) translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
-        #yesBtn {
+        /* Первая кнопка Да */
+        #yesBtn1 {
             background: linear-gradient(135deg, #11998e, #38ef7d);
             color: white;
             position: absolute;
             left: 50%;
-            top: 20px;
+            top: 10px;
             transform: translateX(-50%);
         }
 
+        /* Вторая кнопка Да, куплю */
+        #yesBtn2 {
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            color: white;
+            position: absolute;
+            left: 50%;
+            top: 85px;
+            transform: translateX(-50%);
+        }
+
+        /* Третья кнопка Нажми чтобы выбрать нет */
         #noBtnTrigger {
             background: linear-gradient(135deg, #ff9966, #ff5e62);
             color: white;
             position: absolute;
             left: 50%;
-            top: 120px;
+            top: 170px;
             transform: translateX(-50%);
         }
 
+        /* Убегающая кнопка Нет */
         #runningNoBtn {
             display: none;
             background: linear-gradient(135deg, #ff416c, #ff4b2b);
             color: white;
             position: absolute;
             left: 50%;
-            top: 120px;
+            top: 170px;
             transform: translateX(-50%);
             touch-action: none;
+            width: auto;
+            padding: 14px 50px;
         }
 
         .hidden-screen {
@@ -135,31 +153,25 @@
             width: 85%;
         }
 
-        .success-text {
-            color: #27ae60;
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        /* Стиль для красивой ссылки на Яндекс Еду */
+        /* Фирменная желтая ссылка на Яндекс Еду на чистом экране */
         .yandex-link {
             display: inline-block;
-            margin-top: 15px;
-            padding: 15px 30px;
+            padding: 18px 45px;
             background-color: #fff400;
-            /* Фирменный желтый Яндекс */
             color: #000000;
             font-size: 18px;
             font-weight: bold;
             text-decoration: none;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(255, 244, 0, 0.4);
-            transition: transform 0.2s;
+            border-radius: 18px;
+            box-shadow: 0 6px 20px rgba(255, 244, 0, 0.45);
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .yandex-link:hover {
             transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 244, 0, 0.6);
         }
     </style>
 </head>
@@ -172,7 +184,8 @@
             <h1 id="mainTitle">Купишь мне шашлык</h1>
             <div id="notSoEasyText" class="hint-text">Не всё так просто... Всё-таки нажми ДА! 😈</div>
             <div class="buttons-area">
-                <button id="yesBtn" class="btn">Да</button>
+                <button id="yesBtn1" class="btn">Да</button>
+                <button id="yesBtn2" class="btn">Да, куплю</button>
                 <button id="noBtnTrigger" class="btn">Нажми чтобы выбрать нет</button>
                 <button id="runningNoBtn" class="btn">Нет</button>
             </div>
@@ -186,17 +199,15 @@
             <button id="checkAnswerBtn" class="btn submit-btn">Проверить</button>
         </div>
 
-        <!-- ЭКРАН 3: Ответ "Да" (с кнопкой Яндекс Еды) -->
+        <!-- ЭКРАН 3: Только ссылка на Яндекс Еду -->
         <div id="screenSuccess" class="hidden-screen">
-            <div class="success-text">Да, куплю! 😍</div>
-            <p style="font-size: 16px; color: #555;">Ловлю на слове! Переходи скорее выбирать самый сочный шашлык:</p>
-            <!-- Ссылка на категорию шашлыков в Яндексе -->
             <a href="https://yandex.ru" target="_blank" class="yandex-link">Выбрать в Яндекс Еде 💛</a>
         </div>
     </div>
 
     <script>
-        const yesBtn = document.getElementById('yesBtn');
+        const yesBtn1 = document.getElementById('yesBtn1');
+        const yesBtn2 = document.getElementById('yesBtn2');
         const noBtnTrigger = document.getElementById('noBtnTrigger');
         const runningNoBtn = document.getElementById('runningNoBtn');
 
@@ -211,16 +222,24 @@
 
         let isRunningMode = false;
 
-        yesBtn.addEventListener('click', () => {
+        // Переход на финал при нажатии на любую из двух кнопок "Да"
+        yesBtn1.addEventListener('click', () => {
             screenQuestion.style.display = 'none';
             screenSuccess.style.display = 'block';
         });
 
+        yesBtn2.addEventListener('click', () => {
+            screenQuestion.style.display = 'none';
+            screenSuccess.style.display = 'block';
+        });
+
+        // Нажатие на "Нажми чтобы выбрать нет" -> логарифм
         noBtnTrigger.addEventListener('click', () => {
             screenQuestion.style.display = 'none';
             screenMath.style.display = 'block';
         });
 
+        // Проверка ответа (log2(16) = 4)
         checkAnswerBtn.addEventListener('click', () => {
             const answer = mathAnswer.value.trim();
             if (answer === '4') {
@@ -233,19 +252,23 @@
                 notSoEasyText.style.display = 'block';
                 runningNoBtn.style.display = 'block';
 
-                yesBtn.style.top = '65px';
+                // Перемещаем кнопки согласия чуть ниже предупреждения
+                yesBtn1.style.top = '100px';
+                yesBtn2.style.top = '175px';
             } else {
                 alert('Неправильно! Попробуй еще раз 🎯');
             }
         });
 
+        // Логика побега для хитрой кнопки "Нет"
         function moveButton() {
             if (!isRunningMode) {
                 isRunningMode = true;
                 runningNoBtn.style.transition = 'all 0.12s ease-out';
+                runningNoBtn.style.width = 'auto'; // Возвращаем компактную ширину при побеге
             }
             const randomX = Math.floor(Math.random() * 70) + 5;
-            const randomY = Math.floor(Math.random() * 60) + 120;
+            const randomY = Math.floor(Math.random() * 55) + 220; // Держим кнопку внизу, чтобы не налетала на текст
             runningNoBtn.style.left = randomX + '%';
             runningNoBtn.style.top = randomY + 'px';
         }
