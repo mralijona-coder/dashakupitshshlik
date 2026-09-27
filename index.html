@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Превью для Telegram -->
+    <meta property="og:title" content="Купишь мне шашлык? 🍖">
+    <meta property="og:description" content="Открой ссылку, тут серьезный вопрос...">
+    <meta property="og:type" content="website">
+
+    <title>Купишь мне шашлык</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 35px;
+            line-height: 1.4;
+        }
+
+        .hint-text {
+            color: #d32f2f;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .buttons-area {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        #yesBtn {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            transform: translateX(-50%);
+        }
+
+        #noBtnTrigger {
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            color: white;
+            position: absolute;
+            left: 50%;
+            top: 120px;
+            transform: translateX(-50%);
+        }
+
+        #runningNoBtn {
+            display: none;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            position: absolute;
+            left: 50%;
+            top: 120px;
+            transform: translateX(-50%);
+            touch-action: none;
+        }
+
+        .hidden-screen {
+            display: none;
+        }
+
+        .math-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+            border: 1px solid #e9ecef;
+        }
+
+        .math-input {
+            width: 80%;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #ced4da;
+            border-radius: 12px;
+            outline: none;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            background: #2c3e50;
+            color: white;
+            width: 85%;
+        }
+
+        .success-text {
+            color: #27ae60;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Стиль для красивой ссылки на Яндекс Еду */
+        .yandex-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 15px 30px;
+            background-color: #fff400;
+            /* Фирменный желтый Яндекс */
+            color: #000000;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(255, 244, 0, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .yandex-link:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- ЭКРАН 1: Главный вопрос -->
+        <div id="screenQuestion">
+            <h1 id="mainTitle">Купишь мне шашлык</h1>
+            <div id="notSoEasyText" class="hint-text">Не всё так просто... Всё-таки нажми ДА! 😈</div>
+            <div class="buttons-area">
+                <button id="yesBtn" class="btn">Да</button>
+                <button id="noBtnTrigger" class="btn">Нажми чтобы выбрать нет</button>
+                <button id="runningNoBtn" class="btn">Нет</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 2: Логарифм -->
+        <div id="screenMath" class="hidden-screen">
+            <h1>Реши задачу 🧐</h1>
+            <div class="math-box">log₂ (16) = ?</div>
+            <input type="number" id="mathAnswer" class="math-input" placeholder="Введите ответ">
+            <button id="checkAnswerBtn" class="btn submit-btn">Проверить</button>
+        </div>
+
+        <!-- ЭКРАН 3: Ответ "Да" (с кнопкой Яндекс Еды) -->
+        <div id="screenSuccess" class="hidden-screen">
+            <div class="success-text">Да, куплю! 😍</div>
+            <p style="font-size: 16px; color: #555;">Ловлю на слове! Переходи скорее выбирать самый сочный шашлык:</p>
+            <!-- Ссылка на категорию шашлыков в Яндексе -->
+            <a href="https://yandex.ru" target="_blank" class="yandex-link">Выбрать в Яндекс Еде 💛</a>
+        </div>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtnTrigger = document.getElementById('noBtnTrigger');
+        const runningNoBtn = document.getElementById('runningNoBtn');
+
+        const screenQuestion = document.getElementById('screenQuestion');
+        const screenMath = document.getElementById('screenMath');
+        const screenSuccess = document.getElementById('screenSuccess');
+        const notSoEasyText = document.getElementById('notSoEasyText');
+        const mainTitle = document.getElementById('mainTitle');
+
+        const mathAnswer = document.getElementById('mathAnswer');
+        const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+
+        let isRunningMode = false;
+
+        yesBtn.addEventListener('click', () => {
+            screenQuestion.style.display = 'none';
+            screenSuccess.style.display = 'block';
+        });
+
+        noBtnTrigger.addEventListener('click', () => {
+            screenQuestion.style.display = 'none';
+            screenMath.style.display = 'block';
+        });
+
+        checkAnswerBtn.addEventListener('click', () => {
+            const answer = mathAnswer.value.trim();
+            if (answer === '4') {
+                screenMath.style.display = 'none';
+                screenQuestion.style.display = 'block';
+
+                mainTitle.style.display = 'none';
+                noBtnTrigger.style.display = 'none';
+
+                notSoEasyText.style.display = 'block';
+                runningNoBtn.style.display = 'block';
+
+                yesBtn.style.top = '65px';
+            } else {
+                alert('Неправильно! Попробуй еще раз 🎯');
+            }
+        });
+
+        function moveButton() {
+            if (!isRunningMode) {
+                isRunningMode = true;
+                runningNoBtn.style.transition = 'all 0.12s ease-out';
+            }
+            const randomX = Math.floor(Math.random() * 70) + 5;
+            const randomY = Math.floor(Math.random() * 60) + 120;
+            runningNoBtn.style.left = randomX + '%';
+            runningNoBtn.style.top = randomY + 'px';
+        }
+
+        runningNoBtn.addEventListener('mouseenter', moveButton);
+        runningNoBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveButton();
+        });
+        runningNoBtn.addEventListener('click', moveButton);
+    </script>
+
+</body>
+
+</html>
